@@ -1,4 +1,6 @@
-streamlit==1.31.0
-PyPDF2==3.0.1
-mistralai==0.1.8
-tavily-python==0.3.3
+streamlit>=1.31.0
+PyPDF2>=3.0.0
+mistralai>=1.9.11          ← Updated to latest version
+tavily-python>=0.3.0
+httpx>=0.24.0             ← Added dependency
+pydantic>=2.0.0           ← Added dependency
