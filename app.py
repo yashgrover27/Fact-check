@@ -20,11 +20,28 @@ Upload a PDF document and this tool will extract claims and fact-check them usin
 Powered by Mistral AI and Tavily Search.
 """)
 
-# Sidebar for API keys
+# Sidebar for API keys - Using Streamlit Secrets for deployment
 with st.sidebar:
     st.header("⚙️ Configuration")
-    mistral_api_key = "9LFYiwWSYI3FgSzv5PP4YJWZlGsRcUgF"
-    tavily_api_key = "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"
+    
+    # Try to get API keys from Streamlit secrets first, fallback to manual input
+    try:
+        mistral_api_key = st.secrets.get("MISTRAL_API_KEY", "")
+        tavily_api_key = st.secrets.get("TAVILY_API_KEY", "")
+        
+        # If secrets are set, show a success message
+        if mistral_api_key and tavily_api_key:
+            st.success("✅ API keys loaded from secrets")
+        else:
+            # Allow manual input if secrets are not set
+            st.info("💡 Enter API keys manually or configure in Streamlit Cloud secrets")
+            mistral_api_key = st.text_input("Mistral API Key", type="password", help="Get your API key from https://console.mistral.ai/")
+            tavily_api_key = st.text_input("Tavily API Key", type="password", help="Get your API key from https://tavily.com/")
+    except Exception as e:
+        # Fallback to manual input if secrets are not available
+        st.info("💡 Enter your API keys below")
+        mistral_api_key = st.text_input("Mistral API Key", type="password", help="Get your API key from https://console.mistral.ai/")
+        tavily_api_key = st.text_input("Tavily API Key", type="password", help="Get your API key from https://tavily.com/")
     
     st.markdown("---")
     st.markdown("### About")
@@ -34,6 +51,14 @@ with st.sidebar:
     2. Identifies key claims using Mistral AI
     3. Fact-checks each claim using Tavily search
     4. Presents a detailed analysis
+    """)
+    
+    st.markdown("---")
+    st.markdown("### 📚 Resources")
+    st.markdown("""
+    - [Mistral API](https://console.mistral.ai/)
+    - [Tavily API](https://tavily.com/)
+    - [GitHub Repository](https://github.com/yourusername/pdf-fact-checker)
     """)
 
 def extract_text_from_pdf(pdf_file) -> str:
@@ -177,6 +202,18 @@ def main():
     # Check if API keys are provided
     if not mistral_api_key or not tavily_api_key:
         st.warning("⚠️ Please enter both Mistral and Tavily API keys in the sidebar to continue.")
+        st.info("""
+        **For Streamlit Cloud deployment:**
+        
+        Add your API keys to Streamlit Cloud secrets:
+        1. Go to your app settings on Streamlit Cloud
+        2. Click on 'Secrets' in the left sidebar
+        3. Add the following:
+        ```
+        MISTRAL_API_KEY = "your-mistral-api-key"
+        TAVILY_API_KEY = "your-tavily-api-key"
+        ```
+        """)
         return
     
     # Initialize clients
