@@ -1,0 +1,4 @@
+streamlit==1.31.0
+PyPDF2==3.0.1
+mistralai==0.1.8
+tavily-python==0.3.3
