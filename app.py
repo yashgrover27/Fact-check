@@ -1,10 +1,23 @@
 import streamlit as st
 import PyPDF2
-from mistralai import Mistral
-from tavily import TavilyClient
 import json
 import io
 from typing import List, Dict
+
+# Import with error handling
+try:
+    from mistralai import Mistral
+except ImportError as e:
+    st.error(f"Error importing Mistral: {e}")
+    st.info("Please ensure mistralai package is installed. Try: pip install mistralai>=1.0.0")
+    st.stop()
+
+try:
+    from tavily import TavilyClient
+except ImportError as e:
+    st.error(f"Error importing Tavily: {e}")
+    st.info("Please ensure tavily-python package is installed. Try: pip install tavily-python>=0.3.0")
+    st.stop()
 
 # Page configuration
 st.set_page_config(
@@ -25,9 +38,14 @@ with st.sidebar:
     st.header("⚙️ Configuration")
     
     # Try to get API keys from Streamlit secrets first, fallback to manual input
+    mistral_api_key = ""
+    tavily_api_key = ""
+    
     try:
-        mistral_api_key = st.secrets.get("MISTRAL_API_KEY", "")
-        tavily_api_key = st.secrets.get("TAVILY_API_KEY", "")
+        # Try to access secrets
+        if hasattr(st, 'secrets') and st.secrets is not None:
+            mistral_api_key = st.secrets.get("MISTRAL_API_KEY", "")
+            tavily_api_key = st.secrets.get("TAVILY_API_KEY", "")
         
         # If secrets are set, show a success message
         if mistral_api_key and tavily_api_key:
@@ -222,6 +240,7 @@ def main():
         tavily_client = TavilyClient(api_key=tavily_api_key)
     except Exception as e:
         st.error(f"Error initializing API clients: {str(e)}")
+        st.info("Please check your API keys are valid and have proper permissions.")
         return
     
     # File upload
