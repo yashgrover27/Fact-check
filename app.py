@@ -6,7 +6,7 @@ from typing import List, Dict
 
 # Import with error handling
 try:
-from mistralai.client import MistralClient as Mistral
+    from mistralai import Mistral
 except ImportError as e:
     st.error(f"Error importing Mistral: {e}")
     st.info("Please ensure mistralai package is installed. Try: pip install mistralai>=1.0.0")
